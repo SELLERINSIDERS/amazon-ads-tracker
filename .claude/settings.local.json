@@ -11,7 +11,8 @@
       "Bash(pkill:*)",
       "Bash(npm run dev:*)",
       "Bash(npx prisma db push:*)",
-      "Bash(env:*)"
+      "Bash(env:*)",
+      "Bash(POSTGRES_URL='postgresql://neondb_owner:npg_Ds5RAWGfIyS1@ep-late-smoke-aivmatf0-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' npx prisma db push:*)"
     ]
   }
 }
