@@ -41,5 +41,9 @@ export async function GET(request: NextRequest) {
   }
 
   // Redirect to settings with the code as a query param
-  return NextResponse.redirect(new URL(`/settings?amazon_code=${code}`, request.url))
+  // Use x-forwarded-host header for production behind reverse proxy
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:8080'
+  const protocol = request.headers.get('x-forwarded-proto') || 'https'
+  const baseUrl = `${protocol}://${host}`
+  return NextResponse.redirect(new URL(`/settings?amazon_code=${code}`, baseUrl))
 }
