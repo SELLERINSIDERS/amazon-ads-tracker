@@ -14,7 +14,18 @@
       "Bash(env:*)",
       "Bash(POSTGRES_URL='postgresql://neondb_owner:npg_Ds5RAWGfIyS1@ep-late-smoke-aivmatf0-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' npx prisma db push:*)",
       "Bash(POSTGRES_URL='postgresql://neondb_owner:npg_Ds5RAWGfIyS1@ep-late-smoke-aivmatf0-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' SESSION_SECRET='ba1pJl/hep9z5dOjYegBOA6O53XSAMu+mKZpwv95H1+Wps09oPj+qmiOTgEklxKjkpC/YuRIxL0vS1O2htayww==' PPC_DASHBOARD_PASSWORD='temporary-dev-password' NODE_ENV=production npm run start)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx tsc:*)",
+      "WebSearch",
+      "WebFetch(domain:advertising.amazon.com)",
+      "Bash(xargs:*)",
+      "Bash(grep:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
