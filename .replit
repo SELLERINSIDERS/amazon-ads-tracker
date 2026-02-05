@@ -12,7 +12,7 @@ npm_config_prefix = "/home/runner/$REPL_SLUG/.config/npm/node_global"
 [deployment]
 run = ["npm", "start"]
 build = ["npm", "run", "build"]
-deploymentTarget = "autoscale"
+deploymentTarget = "gce"
 
 [agent]
 expertMode = true
@@ -20,7 +20,7 @@ expertMode = true
 [userenv]
 
 [userenv.shared]
-POSTGRES_URL = "postgresql://postgres:password@helium:5432/heliumdb"
+POSTGRES_URL = "postgresql://neondb_owner:npg_Ds5RAWGfIyS1@ep-late-smoke-aivmatf0-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require"
 
 [workflows]
 runButton = "Project"
