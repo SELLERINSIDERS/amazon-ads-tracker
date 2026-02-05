@@ -169,13 +169,90 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AMZN-01 | Phase 2 | Pending |
+| AMZN-02 | Phase 2 | Pending |
+| AMZN-03 | Phase 2 | Pending |
+| AMZN-04 | Phase 2 | Pending |
+| AMZN-05 | Phase 2 | Pending |
+| AMZN-06 | Phase 2 | Pending |
+| SYNC-01 | Phase 3 | Pending |
+| SYNC-02 | Phase 3 | Pending |
+| SYNC-03 | Phase 3 | Pending |
+| SYNC-04 | Phase 3 | Pending |
+| SYNC-05 | Phase 3 | Pending |
+| SYNC-06 | Phase 3 | Pending |
+| DASH-01 | Phase 4 | Pending |
+| DASH-02 | Phase 4 | Pending |
+| DASH-03 | Phase 4 | Pending |
+| DASH-04 | Phase 4 | Pending |
+| DASH-05 | Phase 4 | Pending |
+| DASH-06 | Phase 4 | Pending |
+| CAMP-01 | Phase 4 | Pending |
+| CAMP-02 | Phase 4 | Pending |
+| CAMP-03 | Phase 4 | Pending |
+| CAMP-04 | Phase 5 | Pending |
+| CAMP-05 | Phase 5 | Pending |
+| CAMP-06 | Phase 5 | Pending |
+| CAMP-07 | Phase 4 | Pending |
+| KWRD-01 | Phase 5 | Pending |
+| KWRD-02 | Phase 5 | Pending |
+| KWRD-03 | Phase 5 | Pending |
+| KWRD-04 | Phase 5 | Pending |
+| KWRD-05 | Phase 5 | Pending |
+| KWRD-06 | Phase 5 | Pending |
+| RULE-01 | Phase 8 | Pending |
+| RULE-02 | Phase 8 | Pending |
+| RULE-03 | Phase 8 | Pending |
+| RULE-04 | Phase 8 | Pending |
+| RULE-05 | Phase 8 | Pending |
+| RULE-06 | Phase 8 | Pending |
+| RULE-07 | Phase 8 | Pending |
+| SAFE-01 | Phase 6 | Pending |
+| SAFE-02 | Phase 6 | Pending |
+| SAFE-03 | Phase 6 | Pending |
+| SAFE-04 | Phase 6 | Pending |
+| SAFE-05 | Phase 6 | Pending |
+| CHAT-01 | Phase 7 | Pending |
+| CHAT-02 | Phase 7 | Pending |
+| CHAT-03 | Phase 7 | Pending |
+| CHAT-04 | Phase 7 | Pending |
+| CHAT-05 | Phase 7 | Pending |
+| AGNT-01 | Phase 7 | Pending |
+| AGNT-02 | Phase 7 | Pending |
+| AGNT-03 | Phase 7 | Pending |
+| AGNT-04 | Phase 7 | Pending |
+| AGNT-05 | Phase 7 | Pending |
+| AGNT-06 | Phase 7 | Pending |
+| AGNT-07 | Phase 7 | Pending |
+| AGNT-08 | Phase 7 | Pending |
+| AGNT-09 | Phase 7 | Pending |
+| AGNT-10 | Phase 7 | Pending |
+| REPT-01 | Phase 8 | Pending |
+| REPT-02 | Phase 8 | Pending |
+| REPT-03 | Phase 8 | Pending |
+| REPT-04 | Phase 8 | Pending |
+| REPT-05 | Phase 8 | Pending |
+| AUDT-01 | Phase 6 | Pending |
+| AUDT-02 | Phase 6 | Pending |
+| AUDT-03 | Phase 6 | Pending |
+| AUDT-04 | Phase 6 | Pending |
+| AUDT-05 | Phase 8 | Pending |
+| AUDT-06 | Phase 8 | Pending |
+| AUDT-07 | Phase 6 | Pending |
+| SETT-01 | Phase 7 | Pending |
+| SETT-02 | Phase 6 | Pending |
+| SETT-03 | Phase 8 | Pending |
+| SETT-04 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 64 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 64
+- v1 requirements: 68 total
+- Mapped to phases: 68 (100%)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 after initial definition*
+*Last updated: 2026-02-04 after roadmap creation*
