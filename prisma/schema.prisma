@@ -172,3 +172,36 @@ model AuditEntry {
   @@index([actorType])
   @@index([actionType])
 }
+
+// Agent API key for external agent authentication
+model AgentApiKey {
+  id          String    @id @default(cuid())
+  name        String
+  key         String    @unique
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  revokedAt   DateTime?
+
+  @@index([key])
+}
+
+// Agent heartbeat tracking
+model AgentHeartbeat {
+  id          String    @id @default(cuid())
+  agentKeyId  String?   // Which key was used
+  status      String    // Agent status message
+  timestamp   DateTime  @default(now())
+
+  @@index([timestamp])
+}
+
+// Agent chat messages
+model AgentMessage {
+  id        String   @id @default(cuid())
+  role      String   // 'user' | 'agent'
+  content   String
+  metadata  String?  // JSON for proposed actions, etc.
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

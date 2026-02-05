@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Dashboard UI** - Overview page, campaign list, date range selection
 - [x] **Phase 5: Campaign & Keyword Management** - Inline editing, keyword views, search terms
 - [x] **Phase 6: Safety & Audit Foundation** - Safety limits, audit logging with snapshots
-- [ ] **Phase 7: Agent Integration** - REST API, chat interface, agent actions
+- [x] **Phase 7: Agent Integration** - REST API, chat interface, agent actions
 - [ ] **Phase 8: Rules & Reports** - Rules engine, analytics, rollback capability
 
 ## Phase Details
@@ -148,10 +148,13 @@ Plans:
   7. Agent can trigger data sync and register heartbeat
   8. All API responses use consistent JSON format with data, meta, error fields
   9. Settings page allows user to generate, rotate, and revoke agent API keys
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] TBD (created during plan-phase)
+- [x] 07-01-PLAN.md — API key management and auth middleware
+- [x] 07-02-PLAN.md — Agent read API endpoints (campaigns, keywords, metrics)
+- [x] 07-03-PLAN.md — Agent action endpoints with safety limits
+- [x] 07-04-PLAN.md — Chat messages and UI
 
 ### Phase 8: Rules & Reports
 **Goal**: User can automate decisions with rules engine and analyze performance with reports
@@ -186,7 +189,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Dashboard UI | 3/3 | Complete ✓ | 2026-02-05 |
 | 5. Campaign & Keyword Management | 2/3 | Complete ✓ | 2026-02-04 |
 | 6. Safety & Audit Foundation | 3/3 | Complete ✓ | 2026-02-04 |
-| 7. Agent Integration | 0/TBD | Not started | - |
+| 7. Agent Integration | 4/4 | Complete ✓ | 2026-02-04 |
 | 8. Rules & Reports | 0/TBD | Not started | - |
 
 ---

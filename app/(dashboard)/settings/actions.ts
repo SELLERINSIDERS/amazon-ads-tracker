@@ -7,8 +7,9 @@ import {
   generateAuthorizationUrl,
 } from '@/lib/amazon'
 import { getSafetyLimits, updateSafetyLimits } from '@/lib/safety'
+import { createApiKey, revokeApiKey, listApiKeys } from '@/lib/agent-key'
 import { revalidatePath } from 'next/cache'
-import type { SafetyLimit } from '@prisma/client'
+import type { SafetyLimit, AgentApiKey } from '@prisma/client'
 
 export interface ConnectionStatus {
   connected: boolean
@@ -108,4 +109,24 @@ export async function updateSafetyLimitsAction(
   const updated = await updateSafetyLimits(limits)
   revalidatePath('/settings')
   return updated
+}
+
+// Get all API keys
+export async function getApiKeysAction() {
+  return listApiKeys()
+}
+
+// Generate new API key
+export async function generateApiKeyAction(
+  name: string
+): Promise<{ key: AgentApiKey; plainKey: string }> {
+  const result = await createApiKey(name)
+  revalidatePath('/settings')
+  return result
+}
+
+// Revoke an API key
+export async function revokeApiKeyAction(id: string): Promise<void> {
+  await revokeApiKey(id)
+  revalidatePath('/settings')
 }

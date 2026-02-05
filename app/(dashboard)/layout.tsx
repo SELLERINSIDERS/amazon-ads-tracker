@@ -36,6 +36,12 @@ export default function DashboardLayout({
                   Keywords
                 </Link>
                 <Link
+                  href="/chat"
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Chat
+                </Link>
+                <Link
                   href="/settings"
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >

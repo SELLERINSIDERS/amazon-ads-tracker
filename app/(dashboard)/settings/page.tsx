@@ -1,16 +1,18 @@
 import Link from 'next/link'
 import { verifySession } from '@/lib/dal'
-import { getConnectionStatus, getAuthorizationUrl, getSafetyLimitsAction } from './actions'
+import { getConnectionStatus, getAuthorizationUrl, getSafetyLimitsAction, getApiKeysAction } from './actions'
 import { AmazonConnectionCard } from './amazon-connection-card'
 import { SafetyLimitsCard } from './safety-limits-card'
+import { AgentKeyCard } from './agent-key-card'
 
 export default async function SettingsPage() {
   await verifySession()
 
-  const [connectionStatus, authUrl, safetyLimits] = await Promise.all([
+  const [connectionStatus, authUrl, safetyLimits, apiKeys] = await Promise.all([
     getConnectionStatus(),
     getAuthorizationUrl(),
     getSafetyLimitsAction(),
+    getApiKeysAction(),
   ])
 
   return (
@@ -46,12 +48,7 @@ export default async function SettingsPage() {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900">Agent API Key</h3>
-        <p className="mt-2 text-sm text-gray-500">
-          Generate and manage API keys for external agents. Coming in Phase 7.
-        </p>
-      </div>
+      <AgentKeyCard initialKeys={apiKeys} />
     </div>
   )
 }
