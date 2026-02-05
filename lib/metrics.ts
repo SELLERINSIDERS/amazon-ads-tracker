@@ -172,6 +172,87 @@ export async function getCampaignCount(profileId: string): Promise<{
   return { total, enabled, paused }
 }
 
+export async function getKeywordsWithMetrics(
+  profileId: string,
+  range: DateRangeKey = '30d',
+  filters?: {
+    campaignId?: string
+    adGroupId?: string
+    matchType?: string
+  }
+) {
+  const dateFilter = getDateRangeFilter(range)
+
+  const keywords = await prisma.keyword.findMany({
+    where: {
+      adGroup: {
+        campaign: { profileId },
+        ...(filters?.campaignId && { campaignId: filters.campaignId }),
+      },
+      ...(filters?.adGroupId && { adGroupId: filters.adGroupId }),
+      ...(filters?.matchType && { matchType: filters.matchType }),
+    },
+    include: {
+      adGroup: {
+        include: {
+          campaign: true,
+        },
+      },
+      metrics: dateFilter
+        ? {
+            where: {
+              date: {
+                gte: dateFilter.start,
+                lte: dateFilter.end,
+              },
+            },
+          }
+        : true,
+    },
+    orderBy: { keywordText: 'asc' },
+  })
+
+  return keywords.map((keyword) => {
+    const aggregated = keyword.metrics.reduce(
+      (acc, m) => ({
+        impressions: acc.impressions + m.impressions,
+        clicks: acc.clicks + m.clicks,
+        cost: acc.cost + m.cost,
+        orders: acc.orders + m.orders,
+        sales: acc.sales + m.sales,
+      }),
+      { impressions: 0, clicks: 0, cost: 0, orders: 0, sales: 0 }
+    )
+
+    const { impressions, clicks, cost, orders, sales } = aggregated
+    const acos = sales > 0 ? (cost / sales) * 100 : null
+    const roas = cost > 0 ? sales / cost : null
+    const ctr = impressions > 0 ? (clicks / impressions) * 100 : null
+    const cpc = clicks > 0 ? cost / clicks : null
+
+    return {
+      id: keyword.id,
+      keywordText: keyword.keywordText,
+      matchType: keyword.matchType,
+      state: keyword.state,
+      bid: keyword.bid,
+      campaignId: keyword.adGroup.campaignId,
+      campaignName: keyword.adGroup.campaign.name,
+      adGroupId: keyword.adGroupId,
+      adGroupName: keyword.adGroup.name,
+      impressions,
+      clicks,
+      cost,
+      orders,
+      sales,
+      acos,
+      roas,
+      ctr,
+      cpc,
+    }
+  })
+}
+
 export async function getCampaignsWithMetrics(
   profileId: string,
   range: DateRangeKey = '30d',

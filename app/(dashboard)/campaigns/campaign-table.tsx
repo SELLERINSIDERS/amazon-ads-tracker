@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
 interface Campaign {
   id: string
@@ -185,8 +186,13 @@ export function CampaignTable({
               ) : (
                 sortedCampaigns.map((campaign) => (
                   <tr key={campaign.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                      {campaign.name}
+                    <td className="px-4 py-3 text-sm font-medium truncate max-w-[200px]">
+                      <Link
+                        href={`/campaigns/${campaign.id}`}
+                        className="text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        {campaign.name}
+                      </Link>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">

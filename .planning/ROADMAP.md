@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Amazon API Connection** - OAuth2 flow, token management, rate limiting
 - [x] **Phase 3: Data Sync & Storage** - Campaign/keyword sync from Amazon API to SQLite
 - [x] **Phase 4: Dashboard UI** - Overview page, campaign list, date range selection
-- [ ] **Phase 5: Campaign & Keyword Management** - Inline editing, keyword views, search terms
+- [x] **Phase 5: Campaign & Keyword Management** - Inline editing, keyword views, search terms
 - [ ] **Phase 6: Safety & Audit Foundation** - Safety limits, audit logging with snapshots
 - [ ] **Phase 7: Agent Integration** - REST API, chat interface, agent actions
 - [ ] **Phase 8: Rules & Reports** - Rules engine, analytics, rollback capability
@@ -108,10 +108,12 @@ Plans:
   5. User can view search term report with suggested actions (add keyword, negate, ignore)
   6. User can perform bulk actions on keywords (add, remove, adjust bid, change status, add negative)
   7. User can filter keywords by campaign, ad group, match type, performance range
-**Plans**: TBD
+**Plans**: 3 plans (1 skipped - blocked on external dependencies)
 
 Plans:
-- [ ] TBD (created during plan-phase)
+- [x] 05-01-PLAN.md — Campaign detail page with ad groups drill-down
+- [x] 05-02-PLAN.md — Keywords page with filters and full metrics
+- [x] 05-03-PLAN.md — SKIPPED (requires Amazon API write access)
 
 ### Phase 6: Safety & Audit Foundation
 **Goal**: All actions are logged with full state snapshots and safety limits are enforced
@@ -180,7 +182,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Amazon API Connection | 3/3 | Complete ✓ | 2026-02-05 |
 | 3. Data Sync & Storage | 4/4 | Complete ✓ | 2026-02-05 |
 | 4. Dashboard UI | 3/3 | Complete ✓ | 2026-02-05 |
-| 5. Campaign & Keyword Management | 0/TBD | Not started | - |
+| 5. Campaign & Keyword Management | 2/3 | Complete ✓ | 2026-02-04 |
 | 6. Safety & Audit Foundation | 0/TBD | Not started | - |
 | 7. Agent Integration | 0/TBD | Not started | - |
 | 8. Rules & Reports | 0/TBD | Not started | - |
