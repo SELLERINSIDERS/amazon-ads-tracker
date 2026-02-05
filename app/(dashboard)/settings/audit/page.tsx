@@ -49,11 +49,19 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
         <span className="text-gray-900">Audit Log</span>
       </nav>
 
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Audit Log</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          View all actions taken on your campaigns, keywords, and settings
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Audit Log</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            View all actions taken on your campaigns, keywords, and settings
+          </p>
+        </div>
+        <a
+          href="/api/export/audit"
+          className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          Export CSV
+        </a>
       </div>
 
       <Suspense fallback={<div className="h-12 bg-gray-100 rounded animate-pulse" />}>

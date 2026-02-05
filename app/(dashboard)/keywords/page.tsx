@@ -5,6 +5,7 @@ import { getConnectionStatus } from '../settings/actions'
 import { getKeywordsWithMetrics } from '@/lib/metrics'
 import { prisma } from '@/lib/prisma'
 import { DateRangeSelector } from '@/components/date-range-selector'
+import { ExportButton } from '@/components/export-button'
 import { KeywordsTable } from './keywords-table'
 import type { DateRangeKey } from '@/lib/types/date-range'
 
@@ -75,9 +76,12 @@ export default async function KeywordsPage({ searchParams }: KeywordsPageProps) 
             {keywords.length} keyword{keywords.length !== 1 ? 's' : ''} found
           </p>
         </div>
-        <Suspense fallback={<div className="h-10 w-32 bg-gray-100 rounded animate-pulse" />}>
-          <DateRangeSelector />
-        </Suspense>
+        <div className="flex items-center space-x-4">
+          <ExportButton endpoint="/api/export/keywords" />
+          <Suspense fallback={<div className="h-10 w-32 bg-gray-100 rounded animate-pulse" />}>
+            <DateRangeSelector />
+          </Suspense>
+        </div>
       </div>
 
       <KeywordsTable

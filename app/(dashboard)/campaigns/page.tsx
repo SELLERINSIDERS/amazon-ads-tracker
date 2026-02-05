@@ -3,6 +3,7 @@ import { verifySession } from '@/lib/dal'
 import { getConnectionStatus } from '../settings/actions'
 import { getCampaignsWithMetrics } from '@/lib/metrics'
 import { DateRangeSelector } from '@/components/date-range-selector'
+import { ExportButton } from '@/components/export-button'
 import { CampaignTable } from './campaign-table'
 import type { DateRangeKey } from '@/lib/types/date-range'
 import Link from 'next/link'
@@ -51,9 +52,12 @@ export default async function CampaignsPage({ searchParams }: CampaignsPageProps
             {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''} found
           </p>
         </div>
-        <Suspense fallback={<div className="h-10 w-32 bg-gray-100 rounded animate-pulse" />}>
-          <DateRangeSelector />
-        </Suspense>
+        <div className="flex items-center space-x-4">
+          <ExportButton endpoint="/api/export/campaigns" />
+          <Suspense fallback={<div className="h-10 w-32 bg-gray-100 rounded animate-pulse" />}>
+            <DateRangeSelector />
+          </Suspense>
+        </div>
       </div>
 
       <CampaignTable

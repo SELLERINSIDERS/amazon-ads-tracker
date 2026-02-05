@@ -205,3 +205,38 @@ model AgentMessage {
 
   @@index([createdAt])
 }
+
+// Automation rules
+model AutomationRule {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  enabled         Boolean   @default(true)
+  conditionType   String    // 'acos_above', 'roas_below', etc.
+  conditionValue  Float
+  conditionEntity String    // 'keyword', 'campaign'
+  actionType      String    // 'decrease_bid', 'pause', etc.
+  actionValue     Float?    // e.g., percentage change
+  cooldownHours   Int       @default(24)
+  lastExecutedAt  DateTime?
+  executionCount  Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([enabled])
+}
+
+// Rule execution history
+model RuleExecution {
+  id         String   @id @default(cuid())
+  ruleId     String
+  entityType String
+  entityId   String
+  entityName String?
+  result     String   // 'success', 'skipped', 'failed'
+  message    String?
+  executedAt DateTime @default(now())
+
+  @@index([ruleId])
+  @@index([executedAt])
+}

@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Campaign & Keyword Management** - Inline editing, keyword views, search terms
 - [x] **Phase 6: Safety & Audit Foundation** - Safety limits, audit logging with snapshots
 - [x] **Phase 7: Agent Integration** - REST API, chat interface, agent actions
-- [ ] **Phase 8: Rules & Reports** - Rules engine, analytics, rollback capability
+- [x] **Phase 8: Rules & Reports** - Rules engine, analytics, rollback capability
 
 ## Phase Details
 
@@ -171,10 +171,18 @@ Plans:
   8. User can export all reports as CSV
   9. User can rollback any action with sync check and 3-way diff if current state differs
   10. Settings page manages notification config (which events trigger external alerts)
-**Plans**: TBD
+**Plans**: 3 plans (some features deferred due to external dependencies)
 
 Plans:
-- [ ] TBD (created during plan-phase)
+- [x] 08-01-PLAN.md — Rules database model and management UI
+- [x] 08-02-PLAN.md — Rules execution engine with cooldown
+- [x] 08-03-PLAN.md — CSV export for campaigns, keywords, audit log
+
+Deferred (blocked on external dependencies):
+- Search term analysis (requires Amazon Reporting API)
+- Rollback capability (requires Amazon API write access)
+- Trend charts (would benefit from chart library, can be added later)
+- Notification config (requires external notification service)
 
 ## Progress
 
@@ -190,7 +198,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Campaign & Keyword Management | 2/3 | Complete ✓ | 2026-02-04 |
 | 6. Safety & Audit Foundation | 3/3 | Complete ✓ | 2026-02-04 |
 | 7. Agent Integration | 4/4 | Complete ✓ | 2026-02-04 |
-| 8. Rules & Reports | 0/TBD | Not started | - |
+| 8. Rules & Reports | 3/3 | Complete ✓ | 2026-02-04 |
 
 ---
 *Roadmap created: 2026-02-04*
