@@ -1,5 +1,5 @@
-const LWA_CLIENT_ID = process.env.LWA_CLIENT_ID || ''
-const LWA_CLIENT_SECRET = process.env.LWA_CLIENT_SECRET || ''
+const LWA_CLIENT_ID = process.env.AMAZON_CLIENT_ID || ''
+const LWA_CLIENT_SECRET = process.env.AMAZON_CLIENT_SECRET || ''
 
 // OAuth scopes required for Amazon Advertising API
 const OAUTH_SCOPES = ['advertising::campaign_management']
@@ -21,6 +21,9 @@ export interface AmazonTokenResponse {
   expires_in: number
 }
 
+// Redirect URI for OAuth callback
+const REDIRECT_URI = process.env.AMAZON_REDIRECT_URI || 'http://localhost:3001/api/amazon/callback'
+
 // Generate authorization URL for user to visit
 export function generateAuthorizationUrl(): string {
   const baseUrl = 'https://www.amazon.com/ap/oa'
@@ -28,7 +31,7 @@ export function generateAuthorizationUrl(): string {
     client_id: LWA_CLIENT_ID,
     scope: OAUTH_SCOPES.join(' '),
     response_type: 'code',
-    redirect_uri: 'https://www.amazon.com/ap/oa', // Self-redirect for manual code copy
+    redirect_uri: REDIRECT_URI,
   })
 
   return `${baseUrl}?${params.toString()}`
@@ -48,7 +51,7 @@ export async function exchangeCodeForTokens(authCode: string): Promise<AmazonTok
       code: authCode,
       client_id: LWA_CLIENT_ID,
       client_secret: LWA_CLIENT_SECRET,
-      redirect_uri: 'https://www.amazon.com/ap/oa',
+      redirect_uri: REDIRECT_URI,
     }),
   })
 
