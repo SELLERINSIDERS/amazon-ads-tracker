@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lsof:*)",
+      "Bash(ss:*)",
+      "Bash(netstat:*)",
+      "Bash(fuser:*)",
+      "Bash(npm run start:*)",
+      "Bash(npm run build:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}
