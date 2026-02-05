@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Authentication** - Next.js setup, authentication, database schema
 - [x] **Phase 2: Amazon API Connection** - OAuth2 flow, token management, rate limiting
 - [x] **Phase 3: Data Sync & Storage** - Campaign/keyword sync from Amazon API to SQLite
-- [ ] **Phase 4: Dashboard UI** - Overview page, campaign list, date range selection
+- [x] **Phase 4: Dashboard UI** - Overview page, campaign list, date range selection
 - [ ] **Phase 5: Campaign & Keyword Management** - Inline editing, keyword views, search terms
 - [ ] **Phase 6: Safety & Audit Foundation** - Safety limits, audit logging with snapshots
 - [ ] **Phase 7: Agent Integration** - REST API, chat interface, agent actions
@@ -89,10 +89,12 @@ Plans:
   5. Campaign table shows all campaigns (SP/SB/SD) with sortable columns and full metrics
   6. User can filter campaigns by type, status, performance range, date range
   7. Date range selector works across all pages (Today, 7d, 30d, 90d, Custom, Lifetime)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD (created during plan-phase)
+- [x] 04-01-PLAN.md — Date range & metrics query (types, selector, aggregation)
+- [x] 04-02-PLAN.md — Performance cards & alerts (MetricCard, dashboard update)
+- [x] 04-03-PLAN.md — Campaign table (sortable columns, filters)
 
 ### Phase 5: Campaign & Keyword Management
 **Goal**: User can manually manage campaigns and keywords with inline editing
@@ -177,7 +179,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Foundation & Authentication | 3/3 | Complete ✓ | 2026-02-05 |
 | 2. Amazon API Connection | 3/3 | Complete ✓ | 2026-02-05 |
 | 3. Data Sync & Storage | 4/4 | Complete ✓ | 2026-02-05 |
-| 4. Dashboard UI | 0/TBD | Not started | - |
+| 4. Dashboard UI | 3/3 | Complete ✓ | 2026-02-05 |
 | 5. Campaign & Keyword Management | 0/TBD | Not started | - |
 | 6. Safety & Audit Foundation | 0/TBD | Not started | - |
 | 7. Agent Integration | 0/TBD | Not started | - |

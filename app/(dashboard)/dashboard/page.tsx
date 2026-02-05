@@ -1,56 +1,120 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { verifySession } from '@/lib/dal'
 import { getConnectionStatus } from '../settings/actions'
 import { SyncStatus } from '@/components/sync-status'
-import { prisma } from '@/lib/prisma'
+import { MetricCard } from '@/components/metric-card'
+import { DateRangeSelector } from '@/components/date-range-selector'
+import { getDashboardMetrics, getCampaignCount } from '@/lib/metrics'
+import type { DateRangeKey } from '@/lib/types/date-range'
 
-export default async function DashboardPage() {
-  // This will redirect to /login if not authenticated
+interface DashboardPageProps {
+  searchParams: { range?: string }
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   await verifySession()
   const connectionStatus = await getConnectionStatus()
+  const range = (searchParams.range as DateRangeKey) || '30d'
 
-  // Get campaign count if connected
-  let campaignCount = 0
+  // Get metrics if connected
+  let metrics = null
+  let campaignCounts = { total: 0, enabled: 0, paused: 0 }
+
   if (connectionStatus.profileId) {
-    campaignCount = await prisma.campaign.count({
-      where: { profileId: connectionStatus.profileId },
-    })
+    [metrics, campaignCounts] = await Promise.all([
+      getDashboardMetrics(connectionStatus.profileId, range),
+      getCampaignCount(connectionStatus.profileId),
+    ])
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Welcome to the PPC Command Center
-        </p>
-      </div>
-
-      {/* Placeholder cards for future dashboard content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-sm font-medium text-gray-500">Total Spend</h3>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">$0.00</p>
-          <p className="mt-1 text-sm text-gray-500">Coming in Phase 4</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-sm font-medium text-gray-500">ACoS</h3>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">0%</p>
-          <p className="mt-1 text-sm text-gray-500">Coming in Phase 4</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-sm font-medium text-gray-500">Campaigns</h3>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">{campaignCount}</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
           <p className="mt-1 text-sm text-gray-500">
-            {campaignCount > 0 ? 'Synced' : 'Sync to load'}
+            Welcome to the PPC Command Center
           </p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-sm font-medium text-gray-500">Agent Status</h3>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">--</p>
-          <p className="mt-1 text-sm text-gray-500">Coming in Phase 7</p>
-        </div>
+        <Suspense fallback={<div className="h-10 w-32 bg-gray-100 rounded animate-pulse" />}>
+          <DateRangeSelector />
+        </Suspense>
       </div>
+
+      {/* Performance metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="Total Spend"
+          value={metrics?.cost ?? 0}
+          trend={metrics?.trends.cost}
+          format="currency"
+          subtitle={!metrics ? 'Connect to view' : undefined}
+        />
+        <MetricCard
+          title="ACoS"
+          value={metrics?.acos ?? 0}
+          trend={metrics?.trends.acos}
+          format="percent"
+          subtitle={!metrics ? 'Connect to view' : undefined}
+        />
+        <MetricCard
+          title="ROAS"
+          value={metrics?.roas?.toFixed(2) ?? '0.00'}
+          trend={metrics?.trends.roas}
+          subtitle={!metrics ? 'Connect to view' : undefined}
+        />
+        <MetricCard
+          title="Campaigns"
+          value={campaignCounts.total}
+          subtitle={`${campaignCounts.enabled} active, ${campaignCounts.paused} paused`}
+        />
+      </div>
+
+      {/* Second row of metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <MetricCard
+          title="Impressions"
+          value={metrics?.impressions ?? 0}
+          trend={metrics?.trends.impressions}
+          format="number"
+        />
+        <MetricCard
+          title="Clicks"
+          value={metrics?.clicks ?? 0}
+          trend={metrics?.trends.clicks}
+          format="number"
+        />
+        <MetricCard
+          title="CTR"
+          value={metrics?.ctr ?? 0}
+          format="percent"
+        />
+        <MetricCard
+          title="Orders"
+          value={metrics?.orders ?? 0}
+          trend={metrics?.trends.orders}
+          format="number"
+        />
+        <MetricCard
+          title="Sales"
+          value={metrics?.sales ?? 0}
+          trend={metrics?.trends.sales}
+          format="currency"
+        />
+      </div>
+
+      {/* Alerts section */}
+      {campaignCounts.paused > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-yellow-800">Alerts</h3>
+          <ul className="mt-2 text-sm text-yellow-700 space-y-1">
+            <li>
+              {campaignCounts.paused} campaign{campaignCounts.paused > 1 ? 's' : ''} paused
+            </li>
+          </ul>
+        </div>
+      )}
 
       {/* Connection and Sync status */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,6 +152,22 @@ export default async function DashboardPage() {
         </div>
 
         <SyncStatus />
+      </div>
+
+      {/* Placeholders for future features */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Agent Status</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            Agent integration coming in Phase 7.
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Recent Actions</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            Audit logging coming in Phase 6.
+          </p>
+        </div>
       </div>
     </div>
   )

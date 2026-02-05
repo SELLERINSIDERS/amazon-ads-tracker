@@ -24,6 +24,12 @@ export default function DashboardLayout({
                   Dashboard
                 </Link>
                 <Link
+                  href="/campaigns"
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Campaigns
+                </Link>
+                <Link
                   href="/settings"
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >
