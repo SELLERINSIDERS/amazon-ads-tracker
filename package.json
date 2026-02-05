@@ -6,10 +6,11 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^7.3.0",
+    "@prisma/client": "^6.19.2",
     "@radix-ui/react-slot": "^1.2.4",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.6.2",
@@ -18,7 +19,7 @@
     "iron-session": "^8.0.4",
     "lucide-react": "^0.563.0",
     "next": "14.2.35",
-    "prisma": "^7.3.0",
+    "prisma": "^6.19.2",
     "react": "^18",
     "react-dom": "^18",
     "server-only": "^0.0.1",

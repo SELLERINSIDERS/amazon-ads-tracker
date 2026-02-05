@@ -38,3 +38,5 @@ prisma/dev.db-journal
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/lib/generated/prisma
