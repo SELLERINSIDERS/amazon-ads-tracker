@@ -13,7 +13,7 @@ This roadmap delivers a Next.js dashboard for Amazon PPC campaign management wit
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Authentication** - Next.js setup, authentication, database schema
-- [ ] **Phase 2: Amazon API Connection** - OAuth2 flow, token management, rate limiting
+- [x] **Phase 2: Amazon API Connection** - OAuth2 flow, token management, rate limiting
 - [ ] **Phase 3: Data Sync & Storage** - Campaign/keyword sync from Amazon API to SQLite
 - [ ] **Phase 4: Dashboard UI** - Overview page, campaign list, date range selection
 - [ ] **Phase 5: Campaign & Keyword Management** - Inline editing, keyword views, search terms
@@ -51,10 +51,12 @@ Plans:
   4. User can view token health (last refresh, connection status) in settings
   5. User can select Amazon advertising profile after OAuth connection
   6. Rate limiter enforces 10 req/sec burst and 2 req/sec sustained limits
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD (created during plan-phase)
+- [x] 02-01-PLAN.md — Schema & SDK setup (AmazonCredential model, SDK install)
+- [x] 02-02-PLAN.md — OAuth flow & settings page (auth URL, code exchange)
+- [x] 02-03-PLAN.md — Token refresh & profile selection (mutex, health display)
 
 ### Phase 3: Data Sync & Storage
 **Goal**: Dashboard displays current Amazon campaign data synced to local database
@@ -170,7 +172,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Authentication | 3/3 | Complete ✓ | 2026-02-05 |
-| 2. Amazon API Connection | 0/TBD | Not started | - |
+| 2. Amazon API Connection | 3/3 | Complete ✓ | 2026-02-05 |
 | 3. Data Sync & Storage | 0/TBD | Not started | - |
 | 4. Dashboard UI | 0/TBD | Not started | - |
 | 5. Campaign & Keyword Management | 0/TBD | Not started | - |
@@ -180,4 +182,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-04*
+*Last updated: 2026-02-05*

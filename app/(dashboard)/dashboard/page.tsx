@@ -1,8 +1,11 @@
+import Link from 'next/link'
 import { verifySession } from '@/lib/dal'
+import { getConnectionStatus } from '../settings/actions'
 
 export default async function DashboardPage() {
   // This will redirect to /login if not authenticated
-  const session = await verifySession()
+  await verifySession()
+  const connectionStatus = await getConnectionStatus()
 
   return (
     <div className="space-y-6">
@@ -37,12 +40,38 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Connection status placeholder */}
+      {/* Connection status */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <h3 className="text-lg font-medium text-gray-900">Amazon Ads Connection</h3>
-        <p className="mt-2 text-sm text-gray-500">
-          Not connected. Amazon API integration will be available in Phase 2.
-        </p>
+        {connectionStatus.connected ? (
+          <div className="mt-2">
+            <div className="flex items-center space-x-2">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Connected
+              </span>
+              {connectionStatus.profileName && (
+                <span className="text-sm text-gray-600">
+                  {connectionStatus.profileName}
+                </span>
+              )}
+            </div>
+            {!connectionStatus.profileId && (
+              <p className="mt-2 text-sm text-yellow-600">
+                No profile selected.{' '}
+                <Link href="/settings" className="underline hover:text-yellow-800">
+                  Select a profile in Settings
+                </Link>
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="mt-2 text-sm text-gray-500">
+            Not connected.{' '}
+            <Link href="/settings" className="text-blue-600 underline hover:text-blue-800">
+              Connect in Settings
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   )

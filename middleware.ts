@@ -12,7 +12,8 @@ export async function middleware(req: NextRequest) {
 
   // Root path handling
   if (path === '/') {
-    const session = await getIronSession<SessionData>(req.cookies, sessionOptions)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const session = await getIronSession<SessionData>(req.cookies as any, sessionOptions)
     if (session.isLoggedIn) {
       return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
     }
@@ -20,7 +21,8 @@ export async function middleware(req: NextRequest) {
   }
 
   // Optimistic check: only read cookie (no DB queries in Edge Runtime)
-  const session = await getIronSession<SessionData>(req.cookies, sessionOptions)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const session = await getIronSession<SessionData>(req.cookies as any, sessionOptions)
 
   if (isProtectedRoute && !session.isLoggedIn) {
     return NextResponse.redirect(new URL('/login', req.nextUrl))
