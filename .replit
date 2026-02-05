@@ -1,17 +1,55 @@
 run = "npm run start"
 entrypoint = "app/(dashboard)/dashboard/page.tsx"
+modules = ["nodejs-20", "web", "nix"]
 
 [nix]
-channel = "stable-24_05"
+channel = "stable-25_05"
 
 [env]
 PATH = "/home/runner/$REPL_SLUG/.config/npm/node_global/bin:/home/runner/$REPL_SLUG/node_modules/.bin:./node_modules/.bin"
 npm_config_prefix = "/home/runner/$REPL_SLUG/.config/npm/node_global"
 
 [deployment]
-run = ["sh", "-c", "npm run start"]
-build = ["sh", "-c", "npm install && npx prisma generate && npx prisma db push && npm run build"]
+run = ["npm", "start"]
+build = ["npm", "run", "build"]
+deploymentTarget = "autoscale"
 
 [[ports]]
 localPort = 3000
 externalPort = 80
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[agent]
+expertMode = true
+
+[userenv]
+
+[userenv.shared]
+POSTGRES_URL = "postgresql://postgres:password@helium:5432/heliumdb"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Next.js Dev Server"
+
+[[workflows.workflow]]
+name = "Next.js Dev Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
