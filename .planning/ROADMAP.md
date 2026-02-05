@@ -12,7 +12,7 @@ This roadmap delivers a Next.js dashboard for Amazon PPC campaign management wit
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Authentication** - Next.js setup, authentication, database schema
+- [x] **Phase 1: Foundation & Authentication** - Next.js setup, authentication, database schema
 - [ ] **Phase 2: Amazon API Connection** - OAuth2 flow, token management, rate limiting
 - [ ] **Phase 3: Data Sync & Storage** - Campaign/keyword sync from Amazon API to SQLite
 - [ ] **Phase 4: Dashboard UI** - Overview page, campaign list, date range selection
@@ -36,9 +36,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Foundation setup (Next.js, Prisma, session config)
-- [ ] 01-02-PLAN.md — Auth system (middleware, login, logout)
-- [ ] 01-03-PLAN.md — Dashboard shell and verification
+- [x] 01-01-PLAN.md — Foundation setup (Next.js, Prisma, session config)
+- [x] 01-02-PLAN.md — Auth system (middleware, login, logout)
+- [x] 01-03-PLAN.md — Dashboard shell and verification
 
 ### Phase 2: Amazon API Connection
 **Goal**: App can authenticate with Amazon Ads API and maintain valid tokens
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Authentication | 0/3 | Planning complete | - |
+| 1. Foundation & Authentication | 3/3 | Complete ✓ | 2026-02-05 |
 | 2. Amazon API Connection | 0/TBD | Not started | - |
 | 3. Data Sync & Storage | 0/TBD | Not started | - |
 | 4. Dashboard UI | 0/TBD | Not started | - |

@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can log in with password set via PPC_DASHBOARD_PASSWORD env var
-- [ ] **AUTH-02**: User session persists across browser refresh (iron-session cookie)
-- [ ] **AUTH-03**: User can log out from any page
-- [ ] **AUTH-04**: Unauthenticated users are redirected to login page
+- [x] **AUTH-01**: User can log in with password set via PPC_DASHBOARD_PASSWORD env var
+- [x] **AUTH-02**: User session persists across browser refresh (iron-session cookie)
+- [x] **AUTH-03**: User can log out from any page
+- [x] **AUTH-04**: Unauthenticated users are redirected to login page
 
 ### Amazon API Connection
 
@@ -169,10 +169,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
 | AMZN-01 | Phase 2 | Pending |
 | AMZN-02 | Phase 2 | Pending |
 | AMZN-03 | Phase 2 | Pending |
