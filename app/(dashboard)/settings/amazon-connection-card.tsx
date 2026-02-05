@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { exchangeAuthCode, disconnectAmazon, type ConnectionStatus } from './actions'
@@ -30,10 +31,34 @@ export function AmazonConnectionCard({
   connectionStatus,
   authUrl,
 }: AmazonConnectionCardProps) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [authCode, setAuthCode] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+
+  // Auto-submit code from URL if present
+  useEffect(() => {
+    const codeFromUrl = searchParams.get('amazon_code')
+    if (codeFromUrl && !connectionStatus.connected && !isSubmitting) {
+      setAuthCode(codeFromUrl)
+      // Auto-submit the code
+      const submitCode = async () => {
+        setIsSubmitting(true)
+        setError(null)
+        const result = await exchangeAuthCode(codeFromUrl)
+        if (!result.success) {
+          setError(result.error || 'Failed to exchange authorization code')
+        } else {
+          // Clear the URL parameter and refresh
+          router.replace('/settings')
+        }
+        setIsSubmitting(false)
+      }
+      submitCode()
+    }
+  }, [searchParams, connectionStatus.connected, isSubmitting, router])
 
   const handleCopyUrl = async () => {
     try {

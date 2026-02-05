@@ -13,7 +13,8 @@
       "Bash(npx prisma db push:*)",
       "Bash(env:*)",
       "Bash(POSTGRES_URL='postgresql://neondb_owner:npg_Ds5RAWGfIyS1@ep-late-smoke-aivmatf0-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' npx prisma db push:*)",
-      "Bash(POSTGRES_URL='postgresql://neondb_owner:npg_Ds5RAWGfIyS1@ep-late-smoke-aivmatf0-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' SESSION_SECRET='ba1pJl/hep9z5dOjYegBOA6O53XSAMu+mKZpwv95H1+Wps09oPj+qmiOTgEklxKjkpC/YuRIxL0vS1O2htayww==' PPC_DASHBOARD_PASSWORD='temporary-dev-password' NODE_ENV=production npm run start)"
+      "Bash(POSTGRES_URL='postgresql://neondb_owner:npg_Ds5RAWGfIyS1@ep-late-smoke-aivmatf0-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require' SESSION_SECRET='ba1pJl/hep9z5dOjYegBOA6O53XSAMu+mKZpwv95H1+Wps09oPj+qmiOTgEklxKjkpC/YuRIxL0vS1O2htayww==' PPC_DASHBOARD_PASSWORD='temporary-dev-password' NODE_ENV=production npm run start)",
+      "Bash(node -e:*)"
     ]
   }
 }
