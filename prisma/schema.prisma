@@ -138,3 +138,37 @@ model SyncState {
   error        String?
   updatedAt    DateTime  @updatedAt
 }
+
+// Safety limits configuration (single row per installation)
+model SafetyLimit {
+  id                 String   @id @default(cuid())
+  maxBidChangePct    Float    @default(50)     // Max bid change % per action
+  maxBudgetChangePct Float    @default(100)    // Max budget change % per action
+  maxDailySpend      Float?                    // Absolute daily spend cap
+  minBidFloor        Float    @default(0.02)   // Minimum bid allowed
+  maxBidCeiling      Float    @default(100)    // Maximum bid allowed
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+// Audit log entry for tracking all actions
+model AuditEntry {
+  id          String   @id @default(cuid())
+  timestamp   DateTime @default(now())
+  actorType   String   // 'user' | 'agent' | 'rule'
+  actorId     String?  // session ID, agent key, rule ID
+  actionType  String   // 'bid_change', 'budget_change', 'status_change', etc.
+  entityType  String   // 'campaign', 'keyword', 'ad_group'
+  entityId    String
+  entityName  String?  // Human-readable name for display
+  beforeState String?  // JSON string of state before action
+  afterState  String?  // JSON string of state after action
+  reason      String?  // Reason for the action
+  success     Boolean  @default(true)
+  errorMsg    String?  // Error message if action failed
+
+  @@index([timestamp])
+  @@index([entityType, entityId])
+  @@index([actorType])
+  @@index([actionType])
+}

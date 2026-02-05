@@ -6,7 +6,9 @@ import {
   calculateExpiresAt,
   generateAuthorizationUrl,
 } from '@/lib/amazon'
+import { getSafetyLimits, updateSafetyLimits } from '@/lib/safety'
 import { revalidatePath } from 'next/cache'
+import type { SafetyLimit } from '@prisma/client'
 
 export interface ConnectionStatus {
   connected: boolean
@@ -92,4 +94,18 @@ export async function disconnectAmazon(): Promise<{ success: boolean }> {
   await prisma.amazonCredential.deleteMany({})
   revalidatePath('/settings')
   return { success: true }
+}
+
+// Get safety limits
+export async function getSafetyLimitsAction(): Promise<SafetyLimit> {
+  return getSafetyLimits()
+}
+
+// Update safety limits
+export async function updateSafetyLimitsAction(
+  limits: Partial<Omit<SafetyLimit, 'id' | 'createdAt' | 'updatedAt'>>
+): Promise<SafetyLimit> {
+  const updated = await updateSafetyLimits(limits)
+  revalidatePath('/settings')
+  return updated
 }
