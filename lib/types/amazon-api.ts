@@ -19,6 +19,7 @@ export interface SPCampaign {
   dynamicBidding?: {
     strategy: string
   }
+  targetingType?: 'MANUAL' | 'AUTO'
 }
 
 // Sponsored Brands Campaign
@@ -42,7 +43,8 @@ export interface SDCampaign {
   budgetType: 'DAILY'
   startDate?: string
   endDate?: string
-  tactic?: string
+  tactic?: string  // T00020 (product targeting), T00030 (audience targeting)
+  costType?: 'cpc' | 'vcpm'
 }
 
 // Ad Group (shared structure)
@@ -54,13 +56,81 @@ export interface AdGroupResponse {
   defaultBid?: number
 }
 
-// Keyword
+// Keyword (SP)
 export interface KeywordResponse {
   keywordId: number
   adGroupId: number
   campaignId?: number
   keywordText: string
   matchType: MatchType
+  state: EntityState
+  bid?: number
+}
+
+// SB Keyword
+export interface SBKeywordResponse {
+  keywordId: number
+  adGroupId: number
+  campaignId: number
+  keywordText: string
+  matchType: MatchType
+  state: EntityState
+  bid?: number
+}
+
+// SB Negative Keyword
+export interface SBNegativeKeywordResponse {
+  keywordId: number
+  campaignId: number
+  adGroupId?: number
+  keywordText: string
+  matchType: string
+  state: EntityState
+}
+
+// SB Campaign-level Negative Keyword
+export interface SBCampaignNegativeKeywordResponse {
+  campaignNegativeKeywordId: number
+  campaignId: number
+  keywordText: string
+  matchType: string
+  state: EntityState
+}
+
+// Product Target Expression
+export interface TargetExpression {
+  type: string  // asinSameAs, asinCategorySameAs, asinBrandSameAs, etc.
+  value?: string
+}
+
+// SP Product Target
+export interface SPProductTargetResponse {
+  targetId: number
+  adGroupId: number
+  campaignId?: number
+  expressionType: 'auto' | 'manual'
+  expression: TargetExpression[]
+  resolvedExpression?: TargetExpression[]
+  state: EntityState
+  bid?: number
+}
+
+// SB Product Target
+export interface SBProductTargetResponse {
+  targetId: number
+  adGroupId: number
+  campaignId?: number
+  expressions: TargetExpression[]
+  state: EntityState
+  bid?: number
+}
+
+// SD Product Target
+export interface SDProductTargetResponse {
+  targetId: number
+  adGroupId: number
+  expression: TargetExpression[]
+  expressionType: 'auto' | 'manual'
   state: EntityState
   bid?: number
 }
@@ -85,6 +155,9 @@ export interface NormalizedCampaign {
   budgetType: string | null
   startDate: string | null
   endDate: string | null
+  brandEntityId?: string | null   // SB only
+  tactic?: string | null          // SD only
+  costType?: string | null        // SD only
 }
 
 // Normalized ad group for internal use
@@ -104,6 +177,52 @@ export interface NormalizedKeyword {
   matchType: string
   state: string
   bid: number | null
+  campaignType?: CampaignType
+}
+
+// Negative keyword types
+export type NegativeMatchType = 'negativeExact' | 'negativePhrase'
+
+// Negative keyword response from Amazon API
+export interface NegativeKeywordResponse {
+  keywordId: number
+  campaignId: number
+  adGroupId?: number
+  keywordText: string
+  matchType: string
+  state: EntityState
+}
+
+// Campaign-level negative keyword response
+export interface CampaignNegativeKeywordResponse {
+  campaignNegativeKeywordId: number
+  campaignId: number
+  keywordText: string
+  matchType: string
+  state: EntityState
+}
+
+// Normalized negative keyword for internal use
+export interface NormalizedNegativeKeyword {
+  id: string
+  campaignId: string
+  adGroupId: string | null
+  keywordText: string
+  matchType: string
+  state: string
+  campaignType?: CampaignType
+}
+
+// Normalized product target for internal use
+export interface NormalizedProductTarget {
+  id: string
+  adGroupId: string
+  campaignType: CampaignType
+  targetType: string
+  expressionType: string
+  expression: string  // JSON stringified
+  state: string
+  bid: number | null
 }
 
 // Sync result
@@ -114,5 +233,10 @@ export interface SyncResult {
     campaigns: number
     adGroups: number
     keywords: number
+    negativeKeywords?: number
+    productTargets?: number
+    campaignMetrics?: number
+    keywordMetrics?: number
+    productTargetMetrics?: number
   }
 }

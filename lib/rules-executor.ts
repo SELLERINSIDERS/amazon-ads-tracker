@@ -1,7 +1,10 @@
 import { prisma } from './prisma'
 import { getSafetyLimits, validateBidChange } from './safety'
 import { logAction } from './audit'
+import { getAmazonApiOptions } from './amazon-credentials'
+import { updateSPKeywordBid, updateSPKeywordState } from './amazon-api-updates'
 import type { AutomationRule } from '@prisma/client'
+import type { EntityState } from './types/amazon-api'
 
 interface KeywordWithMetrics {
   id: string
@@ -59,6 +62,17 @@ async function executeAction(
   const limits = await getSafetyLimits()
   const currentBid = keyword.bid || 0
 
+  // Get Amazon API credentials for pushing changes
+  const apiOpts = await getAmazonApiOptions()
+  if (!apiOpts) {
+    return {
+      entityId: keyword.id,
+      entityName: keyword.keywordText,
+      result: 'failed',
+      message: 'Amazon API not configured',
+    }
+  }
+
   switch (rule.actionType) {
     case 'decrease_bid': {
       const changePercent = rule.actionValue || 10
@@ -75,7 +89,31 @@ async function executeAction(
         }
       }
 
-      // Update bid
+      // Push to Amazon API first
+      const amazonResult = await updateSPKeywordBid(apiOpts, keyword.id, newBid)
+      if (!amazonResult.success) {
+        await logAction({
+          actorType: 'rule',
+          actorId: rule.id,
+          actionType: 'bid_change',
+          entityType: 'keyword',
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          beforeState: { bid: currentBid },
+          afterState: { bid: newBid },
+          reason: `Rule "${rule.name}": ${rule.conditionType} triggered`,
+          success: false,
+          errorMsg: amazonResult.error,
+        })
+        return {
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          result: 'failed',
+          message: amazonResult.error || 'Amazon API error',
+        }
+      }
+
+      // Update bid in local database
       await prisma.keyword.update({
         where: { id: keyword.id },
         data: { bid: newBid },
@@ -118,7 +156,31 @@ async function executeAction(
         }
       }
 
-      // Update bid
+      // Push to Amazon API first
+      const amazonResult = await updateSPKeywordBid(apiOpts, keyword.id, newBid)
+      if (!amazonResult.success) {
+        await logAction({
+          actorType: 'rule',
+          actorId: rule.id,
+          actionType: 'bid_change',
+          entityType: 'keyword',
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          beforeState: { bid: currentBid },
+          afterState: { bid: newBid },
+          reason: `Rule "${rule.name}": ${rule.conditionType} triggered`,
+          success: false,
+          errorMsg: amazonResult.error,
+        })
+        return {
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          result: 'failed',
+          message: amazonResult.error || 'Amazon API error',
+        }
+      }
+
+      // Update bid in local database
       await prisma.keyword.update({
         where: { id: keyword.id },
         data: { bid: newBid },
@@ -156,7 +218,31 @@ async function executeAction(
         }
       }
 
-      // Update status
+      // Push to Amazon API first
+      const amazonResult = await updateSPKeywordState(apiOpts, keyword.id, 'paused' as EntityState)
+      if (!amazonResult.success) {
+        await logAction({
+          actorType: 'rule',
+          actorId: rule.id,
+          actionType: 'status_change',
+          entityType: 'keyword',
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          beforeState: { state: keyword.state },
+          afterState: { state: 'paused' },
+          reason: `Rule "${rule.name}": ${rule.conditionType} triggered`,
+          success: false,
+          errorMsg: amazonResult.error,
+        })
+        return {
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          result: 'failed',
+          message: amazonResult.error || 'Amazon API error',
+        }
+      }
+
+      // Update status in local database
       await prisma.keyword.update({
         where: { id: keyword.id },
         data: { state: 'paused' },
@@ -194,7 +280,31 @@ async function executeAction(
         }
       }
 
-      // Update status
+      // Push to Amazon API first
+      const amazonResult = await updateSPKeywordState(apiOpts, keyword.id, 'enabled' as EntityState)
+      if (!amazonResult.success) {
+        await logAction({
+          actorType: 'rule',
+          actorId: rule.id,
+          actionType: 'status_change',
+          entityType: 'keyword',
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          beforeState: { state: keyword.state },
+          afterState: { state: 'enabled' },
+          reason: `Rule "${rule.name}": ${rule.conditionType} triggered`,
+          success: false,
+          errorMsg: amazonResult.error,
+        })
+        return {
+          entityId: keyword.id,
+          entityName: keyword.keywordText,
+          result: 'failed',
+          message: amazonResult.error || 'Amazon API error',
+        }
+      }
+
+      // Update status in local database
       await prisma.keyword.update({
         where: { id: keyword.id },
         data: { state: 'enabled' },

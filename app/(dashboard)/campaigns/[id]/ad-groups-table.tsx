@@ -68,15 +68,21 @@ export function AdGroupsTable({ adGroups, campaignId, campaignType }: AdGroupsTa
               <td className="px-4 py-3 text-sm text-gray-500">
                 {formatCurrency(adGroup.defaultBid)}
               </td>
-              <td className="px-4 py-3 text-sm">
-                {campaignType === 'SP' && (
+              <td className="px-4 py-3 text-sm space-x-3">
+                {(campaignType === 'SP' || campaignType === 'SB') && (
                   <Link
                     href={`/keywords?campaignId=${campaignId}&adGroupId=${adGroup.id}`}
                     className="text-blue-600 hover:text-blue-800 hover:underline"
                   >
-                    View Keywords
+                    Keywords
                   </Link>
                 )}
+                <Link
+                  href={`/product-targets?campaignId=${campaignId}&adGroupId=${adGroup.id}`}
+                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  Targets
+                </Link>
               </td>
             </tr>
           ))}

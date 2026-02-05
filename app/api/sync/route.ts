@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server'
 import { syncCampaignData } from '@/lib/sync'
+import { verifySession } from '@/lib/dal'
 
-// POST /api/sync - Trigger sync
+// POST /api/sync - Trigger sync (requires authentication)
 export async function POST() {
+  // Verify user is authenticated
+  try {
+    await verifySession()
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const result = await syncCampaignData()
 

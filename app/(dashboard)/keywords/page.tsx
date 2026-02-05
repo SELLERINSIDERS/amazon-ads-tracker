@@ -15,6 +15,7 @@ interface KeywordsPageProps {
     campaignId?: string
     adGroupId?: string
     matchType?: string
+    campaignType?: string
   }
 }
 
@@ -44,11 +45,11 @@ export default async function KeywordsPage({ searchParams }: KeywordsPageProps) 
     )
   }
 
-  // Get campaigns for filter dropdown
+  // Get campaigns for filter dropdown (SP and SB only - SD has no keywords)
   const campaigns = await prisma.campaign.findMany({
-    where: { profileId: connectionStatus.profileId, type: 'SP' },
+    where: { profileId: connectionStatus.profileId, type: { in: ['SP', 'SB'] } },
     orderBy: { name: 'asc' },
-    select: { id: true, name: true },
+    select: { id: true, name: true, type: true },
   })
 
   // Get ad groups for filter dropdown (filtered by campaign if selected)
@@ -91,6 +92,7 @@ export default async function KeywordsPage({ searchParams }: KeywordsPageProps) 
         currentCampaignId={searchParams.campaignId}
         currentAdGroupId={searchParams.adGroupId}
         currentMatchType={searchParams.matchType}
+        currentCampaignType={searchParams.campaignType}
       />
     </div>
   )

@@ -3,6 +3,9 @@ import { validateAgentRequest, apiResponse, apiError } from '@/lib/agent-auth'
 import { prisma } from '@/lib/prisma'
 import { getSafetyLimits, validateBudgetChange } from '@/lib/safety'
 import { logAction } from '@/lib/audit'
+import { getAmazonApiOptions } from '@/lib/amazon-credentials'
+import { updateCampaignBudget } from '@/lib/amazon-api-updates'
+import type { CampaignType } from '@/lib/types/amazon-api'
 
 export async function POST(request: NextRequest) {
   // Validate API key
@@ -58,11 +61,65 @@ export async function POST(request: NextRequest) {
       return apiError('SAFETY_LIMIT', validation.error || 'Safety limit violated', 400)
     }
 
-    // Update budget in database
-    const updatedCampaign = await prisma.campaign.update({
-      where: { id: campaignId },
-      data: { budget: newBudget },
-    })
+    // Get Amazon API credentials
+    const apiOpts = await getAmazonApiOptions()
+    if (!apiOpts) {
+      return apiError('NOT_CONFIGURED', 'Amazon API not configured', 500)
+    }
+
+    // Push change to Amazon API first
+    const amazonResult = await updateCampaignBudget(
+      apiOpts,
+      campaignId,
+      campaign.type as CampaignType,
+      newBudget
+    )
+    if (!amazonResult.success) {
+      // Log failed Amazon API call
+      await logAction({
+        actorType: 'agent',
+        actorId: authResult.context.apiKey.id,
+        actionType: 'budget_change',
+        entityType: 'campaign',
+        entityId: campaignId,
+        entityName: campaign.name,
+        beforeState: { budget: currentBudget },
+        afterState: { budget: newBudget },
+        reason,
+        success: false,
+        errorMsg: amazonResult.error,
+      })
+
+      return apiError('AMAZON_API_ERROR', amazonResult.error || 'Failed to update Amazon', 500)
+    }
+
+    // Update budget in local database with lastPushedAt timestamp
+    let updatedCampaign
+    try {
+      updatedCampaign = await prisma.campaign.update({
+        where: { id: campaignId },
+        data: {
+          budget: newBudget,
+          lastPushedAt: new Date(), // Track successful Amazon push
+        },
+      })
+    } catch (dbError) {
+      // Critical: Amazon updated but local DB failed
+      console.error('CRITICAL: Amazon updated but local DB failed:', {
+        campaignId,
+        newBudget,
+        error: dbError,
+      })
+      // Still return success since Amazon has the correct value
+      return apiResponse({
+        campaignId,
+        campaignName: campaign.name,
+        previousBudget: currentBudget,
+        newBudget,
+        pushedToAmazon: true,
+        warning: 'Amazon updated successfully but local cache update failed. Will reconcile on next sync.',
+      })
+    }
 
     // Log successful action
     await logAction({
@@ -83,6 +140,7 @@ export async function POST(request: NextRequest) {
       campaignName: campaign.name,
       previousBudget: currentBudget,
       newBudget: updatedCampaign.budget,
+      pushedToAmazon: true,
     })
   } catch (error) {
     console.error('Error changing budget:', error)

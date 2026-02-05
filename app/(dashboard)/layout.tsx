@@ -36,6 +36,18 @@ export default function DashboardLayout({
                   Keywords
                 </Link>
                 <Link
+                  href="/negative-keywords"
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Negatives
+                </Link>
+                <Link
+                  href="/product-targets"
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Targets
+                </Link>
+                <Link
                   href="/rules"
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >

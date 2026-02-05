@@ -238,6 +238,7 @@ export async function getKeywordsWithMetrics(
       bid: keyword.bid,
       campaignId: keyword.adGroup.campaignId,
       campaignName: keyword.adGroup.campaign.name,
+      campaignType: keyword.adGroup.campaign.type,
       adGroupId: keyword.adGroupId,
       adGroupName: keyword.adGroup.name,
       impressions,
@@ -304,6 +305,9 @@ export async function getCampaignsWithMetrics(
       type: campaign.type,
       state: campaign.state,
       budget: campaign.budget,
+      brandEntityId: campaign.brandEntityId,
+      tactic: campaign.tactic,
+      costType: campaign.costType,
       ...derived,
     }
   })

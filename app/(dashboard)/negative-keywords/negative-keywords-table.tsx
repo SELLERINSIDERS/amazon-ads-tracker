@@ -3,37 +3,29 @@
 import { useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-interface Keyword {
+interface NegativeKeyword {
   id: string
   keywordText: string
   matchType: string
   state: string
-  bid: number | null
   campaignId: string
   campaignName: string
   campaignType: string
-  adGroupId: string
-  adGroupName: string
-  impressions: number
-  clicks: number
-  cost: number
-  orders: number
-  sales: number
-  acos: number | null
-  roas: number | null
-  ctr: number | null
-  cpc: number | null
+  adGroupId: string | null
+  adGroupName: string | null
+  level: 'campaign' | 'ad-group'
+  createdAt: Date
 }
 
 interface FilterOption {
   id: string
   name: string
-  campaignId?: string
   type?: string
+  campaignId?: string
 }
 
-interface KeywordsTableProps {
-  keywords: Keyword[]
+interface NegativeKeywordsTableProps {
+  negativeKeywords: NegativeKeyword[]
   campaigns: FilterOption[]
   adGroups: FilterOption[]
   currentCampaignId?: string
@@ -42,38 +34,27 @@ interface KeywordsTableProps {
   currentCampaignType?: string
 }
 
-type SortKey = keyof Keyword
+type SortKey = 'keywordText' | 'campaignName' | 'campaignType' | 'matchType' | 'state' | 'level' | 'adGroupName'
 type SortDirection = 'asc' | 'desc'
 
-function formatCurrency(value: number | null): string {
-  if (value === null) return '--'
-  return `$${value.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
-}
-
-function formatPercent(value: number | null): string {
-  if (value === null) return '--'
-  return `${value.toFixed(1)}%`
-}
-
-function formatNumber(value: number): string {
-  return value.toLocaleString('en-US')
-}
-
-const MATCH_TYPES = ['exact', 'phrase', 'broad']
+const MATCH_TYPES = ['negativeExact', 'negativePhrase']
 const CAMPAIGN_TYPES = ['SP', 'SB']
 
-export function KeywordsTable({
-  keywords,
+function formatMatchType(matchType: string): string {
+  if (matchType === 'negativeExact') return 'Negative Exact'
+  if (matchType === 'negativePhrase') return 'Negative Phrase'
+  return matchType
+}
+
+export function NegativeKeywordsTable({
+  negativeKeywords,
   campaigns,
   adGroups,
   currentCampaignId,
   currentAdGroupId,
   currentMatchType,
   currentCampaignType,
-}: KeywordsTableProps) {
+}: NegativeKeywordsTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -118,26 +99,49 @@ export function KeywordsTable({
     : adGroups
 
   const sortedKeywords = useMemo(() => {
-    return [...keywords].sort((a, b) => {
-      const aVal = a[sortKey]
-      const bVal = b[sortKey]
+    return [...negativeKeywords].sort((a, b) => {
+      let aVal: string | null = null
+      let bVal: string | null = null
+
+      switch (sortKey) {
+        case 'keywordText':
+          aVal = a.keywordText
+          bVal = b.keywordText
+          break
+        case 'campaignName':
+          aVal = a.campaignName
+          bVal = b.campaignName
+          break
+        case 'campaignType':
+          aVal = a.campaignType
+          bVal = b.campaignType
+          break
+        case 'matchType':
+          aVal = a.matchType
+          bVal = b.matchType
+          break
+        case 'state':
+          aVal = a.state
+          bVal = b.state
+          break
+        case 'level':
+          aVal = a.level
+          bVal = b.level
+          break
+        case 'adGroupName':
+          aVal = a.adGroupName
+          bVal = b.adGroupName
+          break
+      }
 
       if (aVal === null) return 1
       if (bVal === null) return -1
 
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sortDirection === 'asc'
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal)
-      }
-
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal
-      }
-
-      return 0
+      return sortDirection === 'asc'
+        ? aVal.localeCompare(bVal)
+        : bVal.localeCompare(aVal)
     })
-  }, [keywords, sortKey, sortDirection])
+  }, [negativeKeywords, sortKey, sortDirection])
 
   const SortHeader = ({
     label,
@@ -228,7 +232,7 @@ export function KeywordsTable({
             <option value="">All Match Types</option>
             {MATCH_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
+                {formatMatchType(type)}
               </option>
             ))}
           </select>
@@ -244,24 +248,17 @@ export function KeywordsTable({
                 <SortHeader label="Keyword" sortKeyValue="keywordText" className="min-w-[150px]" />
                 <SortHeader label="Campaign" sortKeyValue="campaignName" />
                 <SortHeader label="Type" sortKeyValue="campaignType" />
-                <SortHeader label="Match" sortKeyValue="matchType" />
+                <SortHeader label="Level" sortKeyValue="level" />
+                <SortHeader label="Ad Group" sortKeyValue="adGroupName" />
+                <SortHeader label="Match Type" sortKeyValue="matchType" />
                 <SortHeader label="Status" sortKeyValue="state" />
-                <SortHeader label="Bid" sortKeyValue="bid" />
-                <SortHeader label="Impr." sortKeyValue="impressions" />
-                <SortHeader label="Clicks" sortKeyValue="clicks" />
-                <SortHeader label="CTR" sortKeyValue="ctr" />
-                <SortHeader label="Spend" sortKeyValue="cost" />
-                <SortHeader label="Orders" sortKeyValue="orders" />
-                <SortHeader label="Sales" sortKeyValue="sales" />
-                <SortHeader label="ACoS" sortKeyValue="acos" />
-                <SortHeader label="ROAS" sortKeyValue="roas" />
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {sortedKeywords.length === 0 ? (
                 <tr>
-                  <td colSpan={14} className="px-4 py-8 text-center text-gray-500">
-                    No keywords found. Try adjusting your filters or sync your data.
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    No negative keywords found. Try adjusting your filters or sync your data.
                   </td>
                 </tr>
               ) : (
@@ -279,8 +276,22 @@ export function KeywordsTable({
                       </span>
                     </td>
                     <td className="px-3 py-3 text-sm">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                        {keyword.matchType}
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          keyword.level === 'campaign'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-indigo-100 text-indigo-800'
+                        }`}
+                      >
+                        {keyword.level === 'campaign' ? 'Campaign' : 'Ad Group'}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-sm text-gray-500">
+                      {keyword.adGroupName || '--'}
+                    </td>
+                    <td className="px-3 py-3 text-sm">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                        {formatMatchType(keyword.matchType)}
                       </span>
                     </td>
                     <td className="px-3 py-3 text-sm">
@@ -293,33 +304,6 @@ export function KeywordsTable({
                       >
                         {keyword.state}
                       </span>
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatCurrency(keyword.bid)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatNumber(keyword.impressions)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatNumber(keyword.clicks)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatPercent(keyword.ctr)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatCurrency(keyword.cost)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatNumber(keyword.orders)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatCurrency(keyword.sales)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatPercent(keyword.acos)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {keyword.roas?.toFixed(2) ?? '--'}
                     </td>
                   </tr>
                 ))

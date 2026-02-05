@@ -3,10 +3,11 @@
 import { useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-interface Keyword {
+interface ProductTarget {
   id: string
-  keywordText: string
-  matchType: string
+  targetType: string
+  expressionType: string
+  expression: string
   state: string
   bid: number | null
   campaignId: string
@@ -28,22 +29,37 @@ interface Keyword {
 interface FilterOption {
   id: string
   name: string
-  campaignId?: string
   type?: string
+  campaignId?: string
 }
 
-interface KeywordsTableProps {
-  keywords: Keyword[]
+interface ProductTargetsTableProps {
+  productTargets: ProductTarget[]
   campaigns: FilterOption[]
   adGroups: FilterOption[]
   currentCampaignId?: string
   currentAdGroupId?: string
-  currentMatchType?: string
   currentCampaignType?: string
 }
 
-type SortKey = keyof Keyword
+type SortKey =
+  | 'expression'
+  | 'campaignName'
+  | 'campaignType'
+  | 'adGroupName'
+  | 'targetType'
+  | 'state'
+  | 'bid'
+  | 'impressions'
+  | 'clicks'
+  | 'cost'
+  | 'orders'
+  | 'sales'
+  | 'acos'
+  | 'roas'
 type SortDirection = 'asc' | 'desc'
+
+const CAMPAIGN_TYPES = ['SP', 'SB', 'SD']
 
 function formatCurrency(value: number | null): string {
   if (value === null) return '--'
@@ -62,30 +78,74 @@ function formatNumber(value: number): string {
   return value.toLocaleString('en-US')
 }
 
-const MATCH_TYPES = ['exact', 'phrase', 'broad']
-const CAMPAIGN_TYPES = ['SP', 'SB']
+function formatTargetType(type: string): string {
+  const typeMap: Record<string, string> = {
+    asinSameAs: 'ASIN',
+    asinCategorySameAs: 'Category',
+    asinBrandSameAs: 'Brand',
+    asinPriceBetween: 'Price Range',
+    asinReviewRatingBetween: 'Rating',
+    queryHighRelMatches: 'Close Match',
+    queryBroadRelMatches: 'Loose Match',
+    asinSubstituteRelated: 'Substitutes',
+    asinAccessoryRelated: 'Complements',
+  }
+  return typeMap[type] || type
+}
 
-export function KeywordsTable({
-  keywords,
+function formatExpression(expression: string, targetType: string): string {
+  try {
+    const parsed = JSON.parse(expression)
+
+    if (Array.isArray(parsed)) {
+      return parsed.map((expr) => formatSingleExpr(expr, targetType)).join(', ')
+    }
+
+    return formatSingleExpr(parsed, targetType)
+  } catch {
+    return expression.substring(0, 30) + (expression.length > 30 ? '...' : '')
+  }
+}
+
+function formatSingleExpr(
+  expr: { type?: string; value?: string },
+  targetType: string
+): string {
+  const value = expr.value || 'Unknown'
+
+  if (expr.type === 'asinSameAs' || targetType === 'asinSameAs') {
+    return value
+  }
+  if (expr.type === 'asinCategorySameAs' || targetType === 'asinCategorySameAs') {
+    return value.length > 20 ? value.substring(0, 20) + '...' : value
+  }
+  if (expr.type === 'asinBrandSameAs' || targetType === 'asinBrandSameAs') {
+    return value
+  }
+
+  return value.substring(0, 20) + (value.length > 20 ? '...' : '')
+}
+
+export function ProductTargetsTable({
+  productTargets,
   campaigns,
   adGroups,
   currentCampaignId,
   currentAdGroupId,
-  currentMatchType,
   currentCampaignType,
-}: KeywordsTableProps) {
+}: ProductTargetsTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [sortKey, setSortKey] = useState<SortKey>('keywordText')
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [sortKey, setSortKey] = useState<SortKey>('impressions')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
     } else {
       setSortKey(key)
-      setSortDirection('asc')
+      setSortDirection('desc') // Default to desc for metrics
     }
   }
 
@@ -117,10 +177,71 @@ export function KeywordsTable({
     ? adGroups.filter((ag) => ag.campaignId === currentCampaignId)
     : adGroups
 
-  const sortedKeywords = useMemo(() => {
-    return [...keywords].sort((a, b) => {
-      const aVal = a[sortKey]
-      const bVal = b[sortKey]
+  const sortedTargets = useMemo(() => {
+    return [...productTargets].sort((a, b) => {
+      let aVal: string | number | null
+      let bVal: string | number | null
+
+      switch (sortKey) {
+        case 'expression':
+          aVal = formatExpression(a.expression, a.targetType)
+          bVal = formatExpression(b.expression, b.targetType)
+          break
+        case 'campaignName':
+          aVal = a.campaignName
+          bVal = b.campaignName
+          break
+        case 'campaignType':
+          aVal = a.campaignType
+          bVal = b.campaignType
+          break
+        case 'adGroupName':
+          aVal = a.adGroupName
+          bVal = b.adGroupName
+          break
+        case 'targetType':
+          aVal = a.targetType
+          bVal = b.targetType
+          break
+        case 'state':
+          aVal = a.state
+          bVal = b.state
+          break
+        case 'bid':
+          aVal = a.bid
+          bVal = b.bid
+          break
+        case 'impressions':
+          aVal = a.impressions
+          bVal = b.impressions
+          break
+        case 'clicks':
+          aVal = a.clicks
+          bVal = b.clicks
+          break
+        case 'cost':
+          aVal = a.cost
+          bVal = b.cost
+          break
+        case 'orders':
+          aVal = a.orders
+          bVal = b.orders
+          break
+        case 'sales':
+          aVal = a.sales
+          bVal = b.sales
+          break
+        case 'acos':
+          aVal = a.acos
+          bVal = b.acos
+          break
+        case 'roas':
+          aVal = a.roas
+          bVal = b.roas
+          break
+        default:
+          return 0
+      }
 
       if (aVal === null) return 1
       if (bVal === null) return -1
@@ -137,7 +258,7 @@ export function KeywordsTable({
 
       return 0
     })
-  }, [keywords, sortKey, sortDirection])
+  }, [productTargets, sortKey, sortDirection])
 
   const SortHeader = ({
     label,
@@ -177,7 +298,11 @@ export function KeywordsTable({
             <option value="">All Types</option>
             {CAMPAIGN_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type === 'SP' ? 'Sponsored Products' : 'Sponsored Brands'}
+                {type === 'SP'
+                  ? 'Sponsored Products'
+                  : type === 'SB'
+                  ? 'Sponsored Brands'
+                  : 'Sponsored Display'}
               </option>
             ))}
           </select>
@@ -216,23 +341,6 @@ export function KeywordsTable({
             ))}
           </select>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Match Type
-          </label>
-          <select
-            value={currentMatchType || ''}
-            onChange={(e) => handleFilterChange('matchType', e.target.value)}
-            className="block rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
-          >
-            <option value="">All Match Types</option>
-            {MATCH_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Table */}
@@ -241,15 +349,15 @@ export function KeywordsTable({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <SortHeader label="Keyword" sortKeyValue="keywordText" className="min-w-[150px]" />
+                <SortHeader label="Target" sortKeyValue="expression" className="min-w-[150px]" />
+                <SortHeader label="Type" sortKeyValue="targetType" />
                 <SortHeader label="Campaign" sortKeyValue="campaignName" />
-                <SortHeader label="Type" sortKeyValue="campaignType" />
-                <SortHeader label="Match" sortKeyValue="matchType" />
+                <SortHeader label="C.Type" sortKeyValue="campaignType" />
+                <SortHeader label="Ad Group" sortKeyValue="adGroupName" />
                 <SortHeader label="Status" sortKeyValue="state" />
                 <SortHeader label="Bid" sortKeyValue="bid" />
                 <SortHeader label="Impr." sortKeyValue="impressions" />
                 <SortHeader label="Clicks" sortKeyValue="clicks" />
-                <SortHeader label="CTR" sortKeyValue="ctr" />
                 <SortHeader label="Spend" sortKeyValue="cost" />
                 <SortHeader label="Orders" sortKeyValue="orders" />
                 <SortHeader label="Sales" sortKeyValue="sales" />
@@ -258,68 +366,71 @@ export function KeywordsTable({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {sortedKeywords.length === 0 ? (
+              {sortedTargets.length === 0 ? (
                 <tr>
                   <td colSpan={14} className="px-4 py-8 text-center text-gray-500">
-                    No keywords found. Try adjusting your filters or sync your data.
+                    No product targets found. Try adjusting your filters or sync
+                    your data.
                   </td>
                 </tr>
               ) : (
-                sortedKeywords.map((keyword) => (
-                  <tr key={keyword.id} className="hover:bg-gray-50">
-                    <td className="px-3 py-3 text-sm font-medium text-gray-900">
-                      {keyword.keywordText}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500 truncate max-w-[150px]">
-                      {keyword.campaignName}
-                    </td>
-                    <td className="px-3 py-3 text-sm">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                        {keyword.campaignType}
-                      </span>
+                sortedTargets.map((target) => (
+                  <tr key={target.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-3 text-sm font-medium text-gray-900 max-w-[150px]">
+                      <div className="truncate" title={target.expression}>
+                        {formatExpression(target.expression, target.targetType)}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-sm">
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                        {keyword.matchType}
+                        {formatTargetType(target.targetType)}
                       </span>
+                    </td>
+                    <td className="px-3 py-3 text-sm text-gray-500 truncate max-w-[120px]">
+                      {target.campaignName}
+                    </td>
+                    <td className="px-3 py-3 text-sm">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                        {target.campaignType}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-sm text-gray-500 truncate max-w-[120px]">
+                      {target.adGroupName}
                     </td>
                     <td className="px-3 py-3 text-sm">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          keyword.state === 'enabled'
+                          target.state === 'enabled'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >
-                        {keyword.state}
+                        {target.state}
                       </span>
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatCurrency(keyword.bid)}
+                      {formatCurrency(target.bid)}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatNumber(keyword.impressions)}
+                      {formatNumber(target.impressions)}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatNumber(keyword.clicks)}
+                      {formatNumber(target.clicks)}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatPercent(keyword.ctr)}
+                      {formatCurrency(target.cost)}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatCurrency(keyword.cost)}
+                      {formatNumber(target.orders)}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatNumber(keyword.orders)}
+                      {formatCurrency(target.sales)}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatCurrency(keyword.sales)}
+                      {formatPercent(target.acos)}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-500">
-                      {formatPercent(keyword.acos)}
-                    </td>
-                    <td className="px-3 py-3 text-sm text-gray-500">
-                      {keyword.roas?.toFixed(2) ?? '--'}
+                      {target.roas?.toFixed(2) ?? '--'}
                     </td>
                   </tr>
                 ))

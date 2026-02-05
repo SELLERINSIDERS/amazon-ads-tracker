@@ -9,6 +9,7 @@ import {
 } from '@/lib/rules'
 import { runRule, runAllRules } from '@/lib/rules-executor'
 import { getConnectionStatus } from '@/app/(dashboard)/settings/actions'
+import { logAction } from '@/lib/audit'
 import type { AutomationRule } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
@@ -21,18 +22,70 @@ export async function createRuleFromTemplateAction(
   }
 
   const rule = await createRule(template.rule)
+
+  // Log rule creation
+  await logAction({
+    actorType: 'user',
+    actionType: 'rule_create',
+    entityType: 'rule',
+    entityId: rule.id,
+    entityName: rule.name,
+    afterState: {
+      name: rule.name,
+      conditionType: rule.conditionType,
+      conditionValue: rule.conditionValue,
+      actionType: rule.actionType,
+      actionValue: rule.actionValue,
+      enabled: rule.enabled,
+    },
+  })
+
   revalidatePath('/rules')
   return rule
 }
 
 export async function toggleRuleAction(ruleId: string): Promise<AutomationRule> {
+  const existingRule = await getRule(ruleId)
   const rule = await toggleRule(ruleId)
+
+  // Log rule toggle
+  await logAction({
+    actorType: 'user',
+    actionType: 'rule_toggle',
+    entityType: 'rule',
+    entityId: rule.id,
+    entityName: rule.name,
+    beforeState: { enabled: existingRule?.enabled },
+    afterState: { enabled: rule.enabled },
+  })
+
   revalidatePath('/rules')
   return rule
 }
 
 export async function deleteRuleAction(ruleId: string): Promise<void> {
+  const existingRule = await getRule(ruleId)
+
   await deleteRule(ruleId)
+
+  // Log rule deletion
+  if (existingRule) {
+    await logAction({
+      actorType: 'user',
+      actionType: 'rule_delete',
+      entityType: 'rule',
+      entityId: ruleId,
+      entityName: existingRule.name,
+      beforeState: {
+        name: existingRule.name,
+        conditionType: existingRule.conditionType,
+        conditionValue: existingRule.conditionValue,
+        actionType: existingRule.actionType,
+        enabled: existingRule.enabled,
+      },
+    })
+  }
+
   revalidatePath('/rules')
 }
 

@@ -10,6 +10,9 @@ interface Campaign {
   type: string
   state: string
   budget: number | null
+  brandEntityId?: string | null
+  tactic?: string | null
+  costType?: string | null
   impressions: number
   clicks: number
   cost: number
@@ -163,6 +166,9 @@ export function CampaignTable({
               <tr>
                 <SortHeader label="Name" sortKeyValue="name" className="min-w-[200px]" />
                 <SortHeader label="Type" sortKeyValue="type" />
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Info
+                </th>
                 <SortHeader label="Status" sortKeyValue="state" />
                 <SortHeader label="Budget" sortKeyValue="budget" />
                 <SortHeader label="Impr." sortKeyValue="impressions" />
@@ -179,7 +185,7 @@ export function CampaignTable({
             <tbody className="bg-white divide-y divide-gray-200">
               {sortedCampaigns.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={14} className="px-4 py-8 text-center text-gray-500">
                     No campaigns found. Sync your data to load campaigns.
                   </td>
                 </tr>
@@ -198,6 +204,31 @@ export function CampaignTable({
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                         {campaign.type}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      {campaign.type === 'SD' && campaign.tactic && (
+                        <div className="flex flex-wrap gap-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                            {campaign.tactic === 'T00020' ? 'Product' : campaign.tactic === 'T00030' ? 'Audience' : campaign.tactic}
+                          </span>
+                          {campaign.costType && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              {campaign.costType.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {campaign.type === 'SB' && campaign.brandEntityId && (
+                        <span
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 truncate max-w-[100px]"
+                          title={campaign.brandEntityId}
+                        >
+                          Brand
+                        </span>
+                      )}
+                      {campaign.type === 'SP' && (
+                        <span className="text-gray-400">--</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <span

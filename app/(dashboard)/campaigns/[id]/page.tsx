@@ -60,6 +60,17 @@ export default async function CampaignDetailPage({
             <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
               {campaign.type}
             </span>
+            {/* SD-specific badges */}
+            {campaign.type === 'SD' && campaign.tactic && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                {campaign.tactic === 'T00020' ? 'Product Targeting' : campaign.tactic === 'T00030' ? 'Audience' : campaign.tactic}
+              </span>
+            )}
+            {campaign.type === 'SD' && campaign.costType && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                {campaign.costType.toUpperCase()}
+              </span>
+            )}
           </div>
           <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
             {campaign.budget && (
@@ -68,6 +79,29 @@ export default async function CampaignDetailPage({
               </span>
             )}
             <span>{campaign.adGroups.length} ad groups</span>
+            {/* SB-specific info */}
+            {campaign.type === 'SB' && campaign.brandEntityId && (
+              <span title={campaign.brandEntityId}>
+                Brand Entity: {campaign.brandEntityId.substring(0, 12)}...
+              </span>
+            )}
+          </div>
+          {/* Quick links */}
+          <div className="mt-3 flex items-center space-x-4">
+            {(campaign.type === 'SP' || campaign.type === 'SB') && (
+              <Link
+                href={`/negative-keywords?campaignId=${campaign.id}`}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                View Negative Keywords
+              </Link>
+            )}
+            <Link
+              href={`/product-targets?campaignId=${campaign.id}`}
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              View Product Targets
+            </Link>
           </div>
         </div>
         <Suspense fallback={<div className="h-10 w-32 bg-gray-100 rounded animate-pulse" />}>

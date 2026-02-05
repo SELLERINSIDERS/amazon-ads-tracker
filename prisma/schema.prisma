@@ -43,20 +43,25 @@ model AmazonCredential {
 
 // Amazon Advertising Campaign (SP, SB, SD)
 model Campaign {
-  id           String    @id
-  profileId    String
-  type         String    // SP, SB, SD
-  name         String
-  state        String    // enabled, paused, archived
-  budget       Float?
-  budgetType   String?   // daily
-  startDate    String?
-  endDate      String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  syncedAt     DateTime?
-  adGroups     AdGroup[]
-  metrics      CampaignMetric[]
+  id               String    @id
+  profileId        String
+  type             String    // SP, SB, SD
+  name             String
+  state            String    // enabled, paused, archived
+  budget           Float?
+  budgetType       String?   // daily
+  startDate        String?
+  endDate          String?
+  brandEntityId    String?   // Required for SB campaigns
+  tactic           String?   // Required for SD campaigns (T00020, T00030, etc.)
+  costType         String?   // SD: cpc or vcpm
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  syncedAt         DateTime?
+  lastPushedAt     DateTime? // Track when last successfully pushed to Amazon
+  adGroups         AdGroup[]
+  metrics          CampaignMetric[]
+  negativeKeywords NegativeKeyword[]
 
   @@index([profileId])
   @@index([type])
@@ -65,15 +70,17 @@ model Campaign {
 
 // Ad Group within a Campaign
 model AdGroup {
-  id           String    @id
-  campaignId   String
-  campaign     Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  name         String
-  state        String    // enabled, paused, archived
-  defaultBid   Float?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  keywords     Keyword[]
+  id               String           @id
+  campaignId       String
+  campaign         Campaign         @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name             String
+  state            String           // enabled, paused, archived
+  defaultBid       Float?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  keywords         Keyword[]
+  negativeKeywords NegativeKeyword[]
+  productTargets   ProductTarget[]
 
   @@index([campaignId])
 }
@@ -87,12 +94,69 @@ model Keyword {
   matchType    String    // exact, phrase, broad
   state        String    // enabled, paused, archived
   bid          Float?
+  campaignType String?   // SP or SB
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  lastPushedAt DateTime? // Track when last successfully pushed to Amazon
   metrics      KeywordMetric[]
 
   @@index([adGroupId])
   @@index([matchType])
+}
+
+// Negative Keyword (campaign-level or ad-group-level)
+model NegativeKeyword {
+  id           String    @id
+  campaignId   String
+  campaign     Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  adGroupId    String?   // null for campaign-level negatives
+  adGroup      AdGroup?  @relation(fields: [adGroupId], references: [id], onDelete: Cascade)
+  keywordText  String
+  matchType    String    // negativeExact, negativePhrase
+  state        String    // enabled, archived
+  campaignType String?   // SP or SB
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([campaignId])
+  @@index([adGroupId])
+}
+
+// Product Target (SP manual targeting, SB, SD)
+model ProductTarget {
+  id              String    @id
+  adGroupId       String
+  adGroup         AdGroup   @relation(fields: [adGroupId], references: [id], onDelete: Cascade)
+  campaignType    String    // SP, SB, SD
+  targetType      String    // asinSameAs, asinCategorySameAs, etc.
+  expressionType  String    // auto, manual
+  expression      String    // JSON string of targeting expression
+  state           String    // enabled, paused, archived
+  bid             Float?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastPushedAt    DateTime?
+  metrics         ProductTargetMetric[]
+
+  @@index([adGroupId])
+  @@index([campaignType])
+}
+
+// Daily metrics for a Product Target
+model ProductTargetMetric {
+  id              String        @id @default(cuid())
+  productTargetId String
+  productTarget   ProductTarget @relation(fields: [productTargetId], references: [id], onDelete: Cascade)
+  date            String        // YYYYMMDD format
+  impressions     Int           @default(0)
+  clicks          Int           @default(0)
+  cost            Float         @default(0)
+  orders          Int           @default(0)
+  sales           Float         @default(0)
+  createdAt       DateTime      @default(now())
+
+  @@unique([productTargetId, date])
+  @@index([date])
 }
 
 // Daily metrics for a Campaign
